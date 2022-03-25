@@ -45,17 +45,20 @@ def dict_match(str1, str2):
 def decoration(R):
     def decorator(func):
         s = dict()
+        order = list()
         def wrapper(value):
-            if value in s.values():
-                pass
-            elif (value not in s.values()) and (len(s) < R):
-                s[len(s)] = value
-                func(value)
-            elif (value not in s.values()) and  (len(s) == R):
-                for j in range(1,len(s)):
-                    s[j-1] = s[j]
-                    s[R-1] = value
-                func(value)
+            if value in s:
+                i = s[value][1]
+                order.append(order[i])
+                del order[i]
+                for j in range(i, len(order)):
+                    s[value][1] = j
+            else:
+                order.append(value)
+                if len(order) > R:
+                    del order[0]
+                s[value] = [func(value), len(order)]
+            return s[value][0]
         return wrapper
     return decorator
 @decoration(2)
